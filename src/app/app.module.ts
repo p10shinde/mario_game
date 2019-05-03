@@ -7,12 +7,14 @@ import { AppComponent } from './app.component';
 import { HomeComponent } from './home/home.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { VictoryComponent } from './victory/victory.component';
+import { TestdirectiveDirective } from './testdirective.directive';
 
 @NgModule({
   declarations: [
     AppComponent,
     HomeComponent,
-    VictoryComponent
+    VictoryComponent,
+    TestdirectiveDirective
   ],
   imports: [
     BrowserModule,

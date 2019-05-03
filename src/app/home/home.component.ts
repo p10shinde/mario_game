@@ -1,7 +1,7 @@
-import { Component, OnInit, AfterViewInit } from '@angular/core';
-import { HostListener } from '@angular/core';
+import { Component, OnInit, AfterViewInit, Renderer2 } from '@angular/core';
 import { GeneralService } from '../general.service';
 import * as $ from 'jquery';
+
 
 export enum KEY_CODE {
   RIGHT_ARROW = 'ArrowRight',
@@ -16,8 +16,8 @@ export enum KEY_CODE {
   styleUrls: ['./home.component.less']
 })
 export class HomeComponent implements OnInit, AfterViewInit  {
-  cols: number;
-  rows: number;
+  cols = 2;
+  rows = 2;
   totalGrid: number[];
   mushroomCount: number;
   mushroomPositions: number[];
@@ -32,27 +32,9 @@ export class HomeComponent implements OnInit, AfterViewInit  {
   mushroomFound = 0;
   gameComplete = false;
   invalidInput = false;
+  handleKeyboardEvent: () => void;
 
-  @HostListener('window:keyup', ['$event'])
-  handleKeyboardEvent(event: KeyboardEvent) {
-    this.keypressed = event.key;
-    if (event.key === KEY_CODE.UP_ARROW) {
-      this.handleMarioAtInterval('up');
-    }
-
-    if (event.key === KEY_CODE.RIGHT_ARROW) {
-      this.handleMarioAtInterval('right');
-    }
-
-    if (event.key === KEY_CODE.DOWN_ARROW) {
-      this.handleMarioAtInterval('down');
-    }
-
-    if (event.key === KEY_CODE.LEFT_ARROW) {
-      this.handleMarioAtInterval('left');
-    }
-  }
-  constructor( private gS: GeneralService) { }
+  constructor( private gS: GeneralService, private renderer: Renderer2) { }
 
   handleMarioAtInterval(direction: string) {
     if (this.globalInterval) {
@@ -128,37 +110,23 @@ export class HomeComponent implements OnInit, AfterViewInit  {
     }, 500);
   }
 
-
   checkIfGameComplete() {
-    console.log('Count : ' + this.mushroomFound);
     if (this.mushroomFound === this.rows) {
       clearInterval(this.globalInterval);
       this.gameComplete = true;
+      this.handleKeyboardEvent();
     }
   }
 
   restartGame() {
     this.gameComplete = false;
-    window.location.reload();
+    this.setupGame();
   }
 
   receiveButtonClickFromVictory($event) {
-    console.log($event);
-    if ($event === 'ok') {
-
-    } else if ($event === 'restart') {
+    if ($event === 'restart') {
       this.restartGame();
     }
-  }
-
-  determinePos(i: number) {
-    if (i === this.currentPos) {
-      return true;
-    } else if (i === Math.ceil(this.currentPos / this.rows)) {
-      return true;
-    }
-
-    return false;
   }
 
   getMatrix(rows: number, cols: number) {
@@ -171,7 +139,11 @@ export class HomeComponent implements OnInit, AfterViewInit  {
     return posObj;
   }
 
-  ngOnInit() {
+  setupGame() {
+    $('.mario').hide();
+    setTimeout(() => {
+      $($('.mario')[0]).show();
+    }, 500);
     this.rows = Number(prompt('Enter number of rows? (rows < 11)'));
     this.cols = Number(prompt('Enter number of cols? (cols < 11)'));
     if (this.rows > 0 && this.rows <= 10 && this.cols > 0 && this.cols <= 10 && !isNaN(this.rows) && !isNaN(this.cols)) {
@@ -181,6 +153,40 @@ export class HomeComponent implements OnInit, AfterViewInit  {
     } else {
       this.invalidInput = true;
     }
+    this.currentPos = 0;
+    this.stepCounter = 0;
+    this.mushroomFound = 0;
+    this.rchdLeftEnd = true;
+    this.rchdRightEnd = false;
+    this.rchdBottomEnd = true;
+    this.rchdTopEnd = false;
+    this.startListening();
+  }
+
+  startListening() {
+    this.handleKeyboardEvent = this.renderer.listen('document', 'keyup', event => {
+      this.keypressed = event.key;
+      if (event.key === KEY_CODE.UP_ARROW) {
+        this.handleMarioAtInterval('up');
+      }
+
+      if (event.key === KEY_CODE.RIGHT_ARROW) {
+        this.handleMarioAtInterval('right');
+      }
+
+      if (event.key === KEY_CODE.DOWN_ARROW) {
+        this.handleMarioAtInterval('down');
+      }
+
+      if (event.key === KEY_CODE.LEFT_ARROW) {
+        this.handleMarioAtInterval('left');
+      }
+
+    });
+  }
+
+  ngOnInit() {
+    this.setupGame();
   }
 
   ngAfterViewInit() {
