@@ -1,0 +1,20 @@
+<div class="header">
+  <img src="../../assets/images/mushroomHeader.jpg" alt="">
+  <h3>I am hungry, get me some mushrooms, make me happy...</h3>
+  <img src="../../assets/images/mushroomHeader.jpg" alt="">
+  <p>(Press <b>arrow key</b> to start searching for mushrooms...!!!)</p>
+</div>
+<div class="gridListHolder">
+  <mat-grid-list class="gridList" cols="{{cols}}" rowHeight="150px" >
+    <mat-grid-tile *ngFor="let posObj of this.totalGrid;let i = index">
+      <img class="mushroom hid" src="../../assets/images/mushroom.jpg" alt="" *ngIf="mushroomPositions.includes(i)">
+      <img class="mario" src="../../assets/images/mario.ico" alt="" style="display: none" >
+    </mat-grid-tile>
+  </mat-grid-list>
+</div>
+<div class="invalidInp" *ngIf="invalidInput">
+  <p>Invalid Input Received. Please restart the game.</p>
+  <button mat-raised-button color="warn" (click)="restartGame()">Restart</button>
+</div>
+
+<app-victory [stepCounter]="stepCounter" *ngIf="gameComplete" (event)="receiveButtonClickFromVictory($event)"></app-victory>
