@@ -120,6 +120,7 @@ export class HomeComponent implements OnInit, AfterViewInit  {
 
   restartGame() {
     this.gameComplete = false;
+    this.invalidInput = false;
     this.setupGame();
   }
 
@@ -161,6 +162,7 @@ export class HomeComponent implements OnInit, AfterViewInit  {
     this.rchdBottomEnd = true;
     this.rchdTopEnd = false;
     this.startListening();
+
   }
 
   startListening() {
